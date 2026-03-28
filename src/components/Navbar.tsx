@@ -1,25 +1,21 @@
 import { useEffect } from "react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HoverLinks from "./HoverLinks";
-import { gsap } from "gsap";
-import { ScrollSmoother } from "gsap-trial/ScrollSmoother";
 import "./styles/Navbar.css";
 
-gsap.registerPlugin(ScrollSmoother, ScrollTrigger);
-export let smoother: ScrollSmoother;
+// Mock ScrollSmoother to avoid gsap-trial restrictions in production
+export const smoother = {
+  scrollTo: (target: string, _smooth?: boolean, _position?: string) => {
+    if (target) {
+      document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  },
+  paused: (_state: boolean) => {},
+  scrollTop: (_val: number) => {}
+};
 
 const Navbar = () => {
   useEffect(() => {
-    smoother = ScrollSmoother.create({
-      wrapper: "#smooth-wrapper",
-      content: "#smooth-content",
-      smooth: 1.7,
-      speed: 1.7,
-      effects: true,
-      autoResize: true,
-      ignoreMobileResize: true,
-    });
-
+    // smoother initialization mocked
     smoother.scrollTop(0);
     smoother.paused(true);
 
@@ -31,12 +27,14 @@ const Navbar = () => {
           e.preventDefault();
           let elem = e.currentTarget as HTMLAnchorElement;
           let section = elem.getAttribute("data-href");
-          smoother.scrollTo(section, true, "top top");
+          if (section) {
+            smoother.scrollTo(section, true, "top top");
+          }
         }
       });
     });
     window.addEventListener("resize", () => {
-      ScrollSmoother.refresh(true);
+      // ScrollSmoother.refresh(true); mocked
     });
   }, []);
   return (
